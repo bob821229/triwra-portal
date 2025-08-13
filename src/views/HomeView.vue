@@ -17,7 +17,7 @@
                 職訓公告
             </button> -->
         </div>
-        <el-row :gutter="20" >
+        <el-row :gutter="20">
             <el-col :span="4" v-for="l in filteredLinks" :key="l">
                 <CategoryCard :title="l.category" :items="l.items">
                     <template #icon>
@@ -32,7 +32,7 @@
 
 <script setup>
 import { RouterView } from "vue-router";
-import { ref ,computed} from "vue";
+import { ref, computed } from "vue";
 import { Search } from "@element-plus/icons-vue";
 import CategoryCard from "@/components/CategoryCard.vue";
 const showSearch = ref(false);
@@ -48,12 +48,65 @@ const quickLinks = [
                 link: "https://www.triwra.org.tw/SupervisorProfile",
             },
             { text: "業務部門主管", link: "/DepartmentList" },
-            { text: "行政部門簡介", link: "/" },
-            { text: "辦公空間位置圖", link: "/" },
-            { text: "同仁分機表", link: "/" },
-            { text: "交通位置資訊", link: "/" },
-            { text: "研究院全名與logo", link: "/" },
-            { text: "簡報專用結語", link: "/" },
+            {
+                text: "行政部門簡介",
+                link: "https://tsr01.triwra.org.tw/km/ad_work/download/department01.pdf",
+            },
+            {
+                text: "辦公空間位置圖",
+                list: [
+                    {
+                        text: "22樓",
+                        link: "https://tsr01.triwra.org.tw/km/ad_work/download/o01-04-22F.pdf",
+                    },
+                    {
+                        text: "20樓",
+                        link: "https://tsr01.triwra.org.tw/km/ad_work/download/o01-04-20F.pdf",
+                    },
+                    {
+                        text: "19樓",
+                        link: "https://tsr01.triwra.org.tw/km/ad_work/download/o01-04-19F.pdf",
+                    },
+                    {
+                        text: "16樓",
+                        link: "https://tsr01.triwra.org.tw/km/ad_work/download/o01-04-16F.pdf",
+                    },
+                    {
+                        text: "5樓",
+                        link: "https://tsr01.triwra.org.tw/km/ad_work/download/o01-04-5F.pdf",
+                    },
+                ],
+            },
+            {
+                text: "同仁分機表",
+                list: [
+                    {
+                        text: "分機表單",
+                        link: "https://tsr01.triwra.org.tw/km/ad_work/download/extensionnew/extension.pdf",
+                    },
+                    { text: "話機設定", link: "data/extension01.ppsx" },
+                ],
+            },
+            {
+                text: "交通位置資訊",
+                link: "https://tsr01.triwra.org.tw/km/ad_work/download/entrance003.pdf",
+            },
+            {
+                text: "研究院全名與logo",
+                list: [
+                    {
+                        text: "研究院名稱",
+                        link: "https://tsr01.triwra.org.tw/km/ad_work/download/portal01_07_01.pdf",
+                    },
+                    { text: "中文文件logo_台(白底)", link: "https://tsr01.triwra.org.tw/km/ad_work/download/logo/logo0-1.png" },
+                    { text: "中文文件logo_台(黃字)", link: "https://tsr01.triwra.org.tw/km/ad_work/download/logo/logo0-2.jpg" },
+                    { text: "中文文件logo_台(黃底)", link: "https://tsr01.triwra.org.tw/km/ad_work/download/logo/logo0-3.jpg" },
+                    { text: "中英文件logo_台(白底)", link: "https://tsr01.triwra.org.tw/km/ad_work/download/logo/logo2-1.png" },
+                    { text: "中英文件logo_台(黃字)", link: "https://tsr01.triwra.org.tw/km/ad_work/download/logo/logo2-2.png" },
+                    { text: "中英文件logo_台(黃底)", link: "https://tsr01.triwra.org.tw/km/ad_work/download/logo/logo2-3.png" },
+                ],
+            },
+            { text: "簡報專用結語", link: "data/entrance005.pptx" },
         ],
     },
     {
@@ -114,12 +167,12 @@ const quickLinks = [
                 text: "數位資產平台",
                 link: "https://info.triwra.org.tw/Account/Login?ReturnUrl=%2F",
             },
-            { text: "購置書籍目錄", link: "/" },
+            { text: "購置書籍目錄", link: "data/booklist.xlsx" },
             {
                 text: "常用廠商名錄",
                 link: "https://tsr01.triwra.org.tw/km/ad_work/kmlist_vendor.asp",
             },
-            { text: "計畫投標作業", link: "/" },
+            { text: "計畫投標作業", link: "https://tsr01.triwra.org.tw/km/ad_work/download/o03-04-計畫投標作業.pdf" },
         ],
     },
     {
@@ -130,32 +183,47 @@ const quickLinks = [
                 text: "執行職務遭受不法侵害預防計畫",
                 link: "https://tsr01.triwra.org.tw/km/ad_work/workplaceplan.asp",
             },
-            { text: "性別平等", link: "/" },
-            { text: "健康檢查", link: "/" },
-            { text: "職業安全宣導", link: "/" },
-            { text: "生活管理與禮儀", link: "/" },
-            { text: "防疫健康聲明表", link: "/" },
-            { text: "企業CSR-淨灘與淨山", link: "/" },
+            { text: "性別平等", link: "https://tsr01.triwra.org.tw/km/ad_work/genderEquality.asp" },
+            { text: "健康檢查", list:[
+                {text: "健康檢查須知", link: "https://tsr01.triwra.org.tw/km/ad_work/download/健康檢查須知_內網公告版114.pdf" },
+                {text: "健檢支出證明單", link: "data/健康檢查支出證明單.docx" },
+                {text: "健檢資料使用同意書", link: "https://tsr01.triwra.org.tw/km/ad_work/download/06健康檢查個人資料使用同意書(空白).pdf" },
+            ] },
+            { text: "職業安全宣導", link: "https://tsr01.triwra.org.tw/km/ad_work/kmlist_training.asp" },
+            { text: "生活管理與禮儀", list:[
+                {text: "環境維護", link: "https://tsr01.triwra.org.tw/km/ad_work/download/environment0300.pdf" },
+                {text: "生活須知", link: "https://tsr01.triwra.org.tw/km/ad_work/download/environment0301.pdf" },
+                {text: "工作禮儀", link: "https://tsr01.triwra.org.tw/km/ad_work/download/environment0302.pdf" },
+            ] },
+            { text: "防疫健康聲明表", link: "data/class3_4.docx" },
+            { text: "企業CSR-淨灘與淨山", list:[
+                {text: "活動辦法", link: "https://tsr01.triwra.org.tw/km/ad_work/download/environment0500.pdf" },
+                {text: "心得報告-表格", link: "data/environment0501.docx" },
+            ] },
         ],
     },
     {
         category: "資訊類",
         icon: "icon-plant",
         items: [
-            { text: "資訊安全管理規範", link: "/" },
-            { text: "資訊服務申請單", link: "/" },
-            { text: "圖資使用申請", link: "/" },
-            { text: "遠端服務使用說明", link: "/" },
-            { text: "電腦應用軟體", link: "/" },
+            { text: "資訊安全管理規範", link: "https://tsr01.triwra.org.tw/km/ad_work/download/IT01.pdf" },
+            { text: "資訊服務申請單", link: "data/1.4AC.docx" },
+            { text: "圖資使用申請", list:[
+                {text: "圖資清冊表單", link: "https://docs.google.com/spreadsheets/d/1cLdbSdm1hRLSVUcbN2DZFIthtuirP1c9eq1Q0HBR-us/edit?gid=0#gid=0" },
+                {text: "圖資使用申請單", link: "data/it03_2.docx" },
+                {text: "流程及填寫說明", link: "data/it03_3.pptx" },
+            ] },
+            { text: "遠端服務使用說明", link: "https://tsr01.triwra.org.tw/km/ad_work/download/forti.pdf" },
+            { text: "電腦應用軟體", link: "https://tsr01.triwra.org.tw/km/ad_work/download/it04.pdf" },
         ],
     },
     {
         category: "空拍類",
         icon: "icon-plant",
         items: [
-            { text: "禁飛區圖層(20210615)", link: "/" },
-            { text: "單位飛行計畫規劃申請表", link: "/" },
-            { text: "單位飛行計畫規劃申請表範例", link: "/" },
+            { text: "禁飛區圖層(20210615)", link: "data/vr02.zip" },
+            { text: "單位飛行計畫規劃申請表", link: "data/vr03.docx" },
+            { text: "單位飛行計畫規劃申請表範例", link: "https://tsr01.triwra.org.tw/km/ad_work/download/vr04.pdf" },
         ],
     },
 ];
@@ -165,9 +233,9 @@ const filteredLinks = computed(() => {
     const keyword = input1.value.trim().toLowerCase();
     // 只顯示有符合關鍵字的分類與子連結
     return quickLinks
-        .map(link => {
+        .map((link) => {
             // 檢查分類名稱或子連結文字是否有符合
-            const matchedItems = link.items.filter(item =>
+            const matchedItems = link.items.filter((item) =>
                 item.text.toLowerCase().includes(keyword)
             );
             if (
