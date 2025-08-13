@@ -24,4 +24,5 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
+   base: '/triwra-portal/', // 這個要換成你的 repo 名稱
 })

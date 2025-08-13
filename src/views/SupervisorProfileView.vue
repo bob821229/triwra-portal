@@ -631,7 +631,7 @@ padding:0 20px ;
       color: #333;
       padding: 8px 0 0 0;
       flex-shrink: 0;
-      font-size: 1.15rem;
+      font-size:20px;
     }
     .info-content {
       flex: 1;
@@ -639,6 +639,7 @@ padding:0 20px ;
       color: #222;
       line-height: 1.7;
       word-break: break-all;
+      font-size: 20px;
     }
   }
 }
