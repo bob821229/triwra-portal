@@ -5,7 +5,10 @@
         <span>主管: </span> 
          <router-link to="/">{{data.manager}}</router-link>
         {{ data.managerTitle }}
-        核心業務
+        <br>
+        <span style="font-weight: bold;display: inline-block;margin-top: 5px;">
+            核心業務
+        </span>
         <ul>
             <li v-for="(item, index) in data.core" :key="index">
                 <p>{{ item }}</p>

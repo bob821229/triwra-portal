@@ -1,6 +1,5 @@
 <template>
-    <!-- {{ data }} -->
-   <el-card style="min-width: 1280px;margin-top: 50px;" v-if="data"  shadow="always">
+   <el-card style="width: 1280px;margin-top: 50px;" v-if="data"  shadow="always">
     <template #header>
       <div class="card-header">
         <h1 style="text-align: center;" class="txt-color">{{ data.department }}</h1>
@@ -10,7 +9,8 @@
      <el-row>
         <el-col :span="6">
           <div class="image_wrap" >
-            <el-image style="width: 100%; height: 100%"  fit="cover" />
+            <!-- <img  style="width: 100%; height: 100%" :src="data?.imageUrl"   alt=""> -->
+            <el-image v-if="data?.imageUrl"  style="width: 100%;"  fit="cover"  :src="data?.imageUrl" />
           </div>
         </el-col>
          <el-col :span="18">
@@ -53,26 +53,45 @@
     </el-row>
   </el-card>
    <span v-else>
-    <!-- {{route.params.manager}} -->
     無資料
-    <!-- <el-button type="primary" @click="goBack">返回</el-button> -->
-  </span>
+</span>
+<el-button style="margin-top: 50px;" size="large" type="primary" @click="goBack">返回</el-button>
 </template>
 
 <script setup>
 import { ref, computed } from "vue";
 import ManagerCard from "@/components/ManagerCard.vue";
 import DepartmentCard from "@/components/DepartmentCard.vue";
-import { useRoute, } from "vue-router";
-
+import { useRoute,useRouter } from "vue-router";
+const router = useRouter();
+function goBack() {
+  router.back();
+}
 const route = useRoute()
 console.log('window.history.state:', window.history.state)
 const manager = ref(route.params?.manager)
 const title = ref(route.params?.title)
 const data = computed(() => {
   if (!manager.value || !managerList.length) return null
-  return managerList.find((item) => item.name === manager.value)
+  const managerData = managerList.find((item) => item.name === manager.value)
+  if (!managerData) return null
+  return {
+    ...managerData,
+    imageUrl: new URL(`../assets/images/${managerData.imageUrl}`, import.meta.url).href
+  }
 })
+function getImageUrl(fileName) {
+  console.log('getImageUrl:', fileName);
+  if (!fileName) return '';
+  try {
+    const url = new URL(`/images/${fileName}`, import.meta.url).href;
+    console.log('image url:', url);
+    return url;
+  } catch (e) {
+    console.error('Image load error:', e);
+    return '';
+  }
+}
 let managerList = [
     {
         name: "林賢銘",
@@ -118,6 +137,7 @@ let managerList = [
                 period: [null, null], //服務起訖年月
             },
         ],
+        imageUrl:'林賢銘.jpg'
     },
     {
         name: "吳柏澍",
@@ -172,6 +192,7 @@ let managerList = [
                 period: [null, null], //服務起訖年月
             },
         ],
+        imageUrl:'吳柏澍.jpg'
     },
     {
         name: "簡靖芳",
@@ -214,6 +235,7 @@ let managerList = [
                 period: [null, null], //服務起訖年月
             },
         ],
+        imageUrl:'簡靖芳.jpg'
     },
     {
         name: "侯玉娟",
@@ -266,6 +288,7 @@ let managerList = [
                 period: [null, null], //服務起訖年月
             },
         ],
+        imageUrl:'侯玉娟.jpg'
     },
     {
         name: "劉柏江",
@@ -345,6 +368,7 @@ let managerList = [
                 period: [null, null], //服務起訖年月
             },
         ],
+        imageUrl:'劉柏江.jpg'
     },
     {
         name: "紀祥鈺",
@@ -394,6 +418,7 @@ let managerList = [
                 period: [null, null], //服務起訖年月
             },
         ],
+        imageUrl:'紀祥鈺.jpg'
     },
     {
         name: "陳昱蓉",
@@ -435,6 +460,7 @@ let managerList = [
                 period: [null, null], //服務起訖年月
             },
         ],
+        imageUrl:'陳昱蓉.jpg'
     },
     {
         name: "謝青宏",
@@ -491,6 +517,7 @@ let managerList = [
                 period: [null, null], //服務起訖年月
             },
         ],
+        imageUrl:'謝青宏.jpg'
     },
     {
         name: "吳宜家",
@@ -536,6 +563,7 @@ let managerList = [
                 period: [null, null], //服務起訖年月
             },
         ],
+        imageUrl:'吳宜家.jpg'
     },
     {
         name: "康文龍",
@@ -564,6 +592,7 @@ let managerList = [
                 period: [null, null], //服務起訖年月
             },
         ],
+        imageUrl:'康文龍.jpg'
     },
 ];
 </script>
@@ -574,6 +603,7 @@ let managerList = [
 }
 .image_wrap{
   height: 100%;
+  max-width: 310px;
 }
 .information_wrap{
 display: flex;

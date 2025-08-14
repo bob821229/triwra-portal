@@ -17,7 +17,7 @@
                 職訓公告
             </button> -->
         </div>
-        <el-row :gutter="20">
+        <el-row :gutter="20" justify="center">
             <el-col :span="4" v-for="l in filteredLinks" :key="l">
                 <CategoryCard :title="l.category" :items="l.items">
                     <template #icon>
@@ -146,7 +146,7 @@ const quickLinks = [
                 link: "https://tsr01.triwra.org.tw/erp/carschedule/Home/Login",
             },
             {
-                text: "公物品管理系統",
+                text: "辦公物品管理系統",
                 link: "https://tsr01.triwra.org.tw/erp/officeproduct/Home/Login",
             },
             {
