@@ -12,13 +12,17 @@
                 placeholder="搜尋"
                 :prefix-icon="Search"
             />
-            <!-- <button class="announce-btn">
-                <span class="announce-icon">⚙️</span>
-                職訓公告
-            </button> -->
+            <button class="announce-btn">
+                <span class="announce-icon" style="white-space: nowrap" @click="edit = !edit">編輯模式⚙️</span>
+            </button>
         </div>
-        <el-row :gutter="20" justify="center">
-            <el-col :span="4" v-for="l in filteredLinks" :key="l">
+        <el-row :gutter="20" v-show="!edit">
+            <el-col
+                style="max-width: 100%"
+                :span="4"
+                v-for="l in filteredLinks"
+                :key="l"
+            >
                 <CategoryCard :title="l.category" :items="l.items">
                     <template #icon>
                         <span :class="l.icon"></span>
@@ -26,8 +30,77 @@
                 </CategoryCard>
             </el-col>
         </el-row>
-        <RouterView />
+        <div v-show="edit">
+            <h1 style="text-align: center;">編輯模式</h1>
+            <div class="kanban-board">
+                <div
+                    class="kanban-list"
+                    v-for="(list, index) in quickLinks"
+                    :key="index"
+                >
+                    <el-card class="kanban-column h-100" :header="list.category">
+                        <draggable
+                            :list="list.items"
+                            group="kanban"
+                            item-key="id"
+                            class="kanban-cards"
+                            @end="(evt) => onDragEnd(evt, list.id)"
+                        >
+                            <template #item="{ element }">
+                                <el-card class="kanban-card" shadow="always">
+                                    {{ element.text }}
+                                </el-card>
+                            </template>
+                        </draggable>
+                        <template #footer>
+                            <!-- 新增卡片按鈕 -->
+                            <div
+                                class="mt-2 text-center"
+                                style="text-align: center"
+                            >
+                                <el-button
+                                    type="success"
+                                    @click="openAddItem(list)"
+                                >
+                                    ＋ 新增連結
+                                </el-button>
+                            </div>
+                        </template>
+                    </el-card>
+                </div>
+            </div>
+        </div>
     </main>
+    <Footer></Footer>
+
+    <!-- 新增清單 Dialog -->
+    <el-dialog v-model="showAddList" title="新增清單" width="400px">
+        <el-input v-model="newListName" placeholder="請輸入清單名稱" />
+        <template #footer>
+            <el-button @click="showAddList = false">取消</el-button>
+            <el-button type="primary" @click="confirmAddList">新增</el-button>
+        </template>
+    </el-dialog>
+
+    <!-- 新增卡片 Dialog -->
+    <el-dialog v-model="showAddItem" title="新增卡片" width="400px">
+        <el-form label-width="80px">
+            <el-form-item label="標題">
+                <el-input v-model="newItem.text" placeholder="請輸入卡片名稱" />
+            </el-form-item>
+            <el-form-item label="連結">
+                <el-input
+                    v-model="newItem.link"
+                    placeholder="請輸入連結（可選）"
+                />
+            </el-form-item>
+        </el-form>
+
+        <template #footer>
+            <el-button @click="showAddItem = false">取消</el-button>
+            <el-button type="primary" @click="confirmAddItem">新增</el-button>
+        </template>
+    </el-dialog>
 </template>
 
 <script setup>
@@ -35,24 +108,95 @@ import { RouterView } from "vue-router";
 import { ref, computed } from "vue";
 import { Search } from "@element-plus/icons-vue";
 import CategoryCard from "@/components/CategoryCard.vue";
+import Footer from "@/components/Footer.vue";
+import draggable from "vuedraggable";
+import { v4 as uuidv4 } from "uuid";
+const edit = ref(false);
+// 防抖處理卡片位置更新
+const syncCardPosition = (payload) => {
+    // console.log("[📦 API 呼叫] 同步卡片位置：", payload);
+    // await axios.post('/api/cards/move', payload)
+};
+// const debouncedSyncCardPosition = debounce(syncCardPosition, 500);
+
+// 拖曳結束事件
+const onDragEnd = (evt, listId) => {
+    console.log("拖曳完成:", evt, "所在清單:", listId);
+    // 這裡可以做資料更新，例如存到後端
+};
+// ==========================
+// 新增清單 Dialog
+// ==========================
+const showAddList = ref(false);
+const newListName = ref("");
+
+const openAddList = () => {
+    newListName.value = "";
+    showAddList.value = true;
+};
+
+const confirmAddList = () => {
+    if (newListName.value.trim()) {
+        quickLinks.value.push({
+            id: uuidv4(),
+            category: newListName.value.trim(),
+            icon: "icon-folder-plus",
+            items: [],
+        });
+        showAddList.value = false;
+    }
+};
+
+// ==========================
+// 新增卡片 Dialog
+// ==========================
+const showAddItem = ref(false);
+const newItem = ref({ text: "", link: "" });
+const currentList = ref(null);
+
+const openAddItem = (list) => {
+    currentList.value = list;
+    newItem.value = { text: "", link: "" };
+    showAddItem.value = true;
+};
+
+const confirmAddItem = () => {
+    if (newItem.value.text.trim()) {
+        currentList.value.items.push({
+            id: uuidv4(),
+            text: newItem.value.text.trim(),
+            link: newItem.value.link.trim() || "#",
+        });
+        showAddItem.value = false;
+    }
+};
 const showSearch = ref(false);
 const input1 = ref("");
-const quickLinks = [
+
+const quickLinks = ref([
     {
+        id: uuidv4(),
         category: "關於台農院",
         icon: "icon-building-library",
         items: [
-            { text: "院簡介(官網)", link: "https://www.triwra.org.tw/" },
             {
+                id: uuidv4(),
+                text: "院簡介(官網)",
+                link: "https://www.triwra.org.tw/",
+            },
+            {
+                id: uuidv4(),
                 text: "院長室",
                 link: "https://www.triwra.org.tw/SupervisorProfile",
             },
-            { text: "業務部門主管", link: "/DepartmentList" },
+            { id: uuidv4(), text: "業務部門主管", link: "/DepartmentList" },
             {
+                id: uuidv4(),
                 text: "行政部門簡介",
                 link: "https://tsr01.triwra.org.tw/km/ad_work/download/department01.pdf",
             },
             {
+                id: uuidv4(),
                 text: "辦公空間位置圖",
                 list: [
                     {
@@ -78,6 +222,7 @@ const quickLinks = [
                 ],
             },
             {
+                id: uuidv4(),
                 text: "同仁分機表",
                 list: [
                     {
@@ -88,151 +233,277 @@ const quickLinks = [
                 ],
             },
             {
+                id: uuidv4(),
                 text: "交通位置資訊",
                 link: "https://tsr01.triwra.org.tw/km/ad_work/download/entrance003.pdf",
             },
             {
+                id: uuidv4(),
                 text: "研究院全名與logo",
                 list: [
                     {
                         text: "研究院名稱",
                         link: "https://tsr01.triwra.org.tw/km/ad_work/download/portal01_07_01.pdf",
                     },
-                    { text: "中文文件logo_台(白底)", link: "https://tsr01.triwra.org.tw/km/ad_work/download/logo/logo0-1.png" },
-                    { text: "中文文件logo_台(黃字)", link: "https://tsr01.triwra.org.tw/km/ad_work/download/logo/logo0-2.jpg" },
-                    { text: "中文文件logo_台(黃底)", link: "https://tsr01.triwra.org.tw/km/ad_work/download/logo/logo0-3.jpg" },
-                    { text: "中英文件logo_台(白底)", link: "https://tsr01.triwra.org.tw/km/ad_work/download/logo/logo2-1.png" },
-                    { text: "中英文件logo_台(黃字)", link: "https://tsr01.triwra.org.tw/km/ad_work/download/logo/logo2-2.png" },
-                    { text: "中英文件logo_台(黃底)", link: "https://tsr01.triwra.org.tw/km/ad_work/download/logo/logo2-3.png" },
+                    {
+                        text: "中文文件logo_台(白底)",
+                        link: "https://tsr01.triwra.org.tw/km/ad_work/download/logo/logo0-1.png",
+                    },
+                    {
+                        text: "中文文件logo_台(黃字)",
+                        link: "https://tsr01.triwra.org.tw/km/ad_work/download/logo/logo0-2.jpg",
+                    },
+                    {
+                        text: "中文文件logo_台(黃底)",
+                        link: "https://tsr01.triwra.org.tw/km/ad_work/download/logo/logo0-3.jpg",
+                    },
+                    {
+                        text: "中英文件logo_台(白底)",
+                        link: "https://tsr01.triwra.org.tw/km/ad_work/download/logo/logo2-1.png",
+                    },
+                    {
+                        text: "中英文件logo_台(黃字)",
+                        link: "https://tsr01.triwra.org.tw/km/ad_work/download/logo/logo2-2.png",
+                    },
+                    {
+                        text: "中英文件logo_台(黃底)",
+                        link: "https://tsr01.triwra.org.tw/km/ad_work/download/logo/logo2-3.png",
+                    },
                 ],
             },
-            { text: "簡報專用結語", link: "data/entrance005.pptx" },
+            {
+                id: uuidv4(),
+                text: "簡報專用結語",
+                link: "data/entrance005.pptx",
+            },
         ],
     },
     {
+        id: uuidv4(),
         category: "行政類",
         icon: "icon-folder",
         items: [
             {
+                id: uuidv4(),
                 text: "行政管理規章(表單下載)",
                 link: "https://tsr01.triwra.org.tw/km/ad_work/kmlist.htm",
             },
             {
+                id: uuidv4(),
                 text: "差勤管理系統",
                 link: "https://webapp.triwra.org.tw/worktime/Home/Login",
             },
             {
+                id: uuidv4(),
                 text: "公文管理系統",
                 link: "https://webapp.triwra.org.tw/eop/Home/Login",
             },
             {
+                id: uuidv4(),
                 text: "計畫期款申請系統",
                 link: "https://tsr01.triwra.org.tw/erp/planmoneyapply/Home/Login",
             },
             {
+                id: uuidv4(),
                 text: "費用申請系統",
                 link: "https://tsr01.triwra.org.tw/erp/moneyapply/Home/Login",
             },
             {
+                id: uuidv4(),
                 text: "會議室申請系統",
                 link: "https://tsr01.triwra.org.tw/erp/meetschedule/Home/Login",
             },
             {
+                id: uuidv4(),
                 text: "設備申借管理系統",
                 link: "https://tsr01.triwra.org.tw/erp/toolapply/Home/Login",
             },
             {
+                id: uuidv4(),
                 text: "公務車申請系統",
                 link: "https://tsr01.triwra.org.tw/erp/carschedule/Home/Login",
             },
             {
+                id: uuidv4(),
                 text: "辦公物品管理系統",
                 link: "https://tsr01.triwra.org.tw/erp/officeproduct/Home/Login",
             },
             {
+                id: uuidv4(),
                 text: "會議紀錄查詢系統",
                 link: "https://tsr01.triwra.org.tw/erp/meetingminutes/Home/Login",
             },
             {
+                id: uuidv4(),
                 text: "簽呈管理系統",
                 link: "https://tsr01.triwra.org.tw/erp/petitionmanage/Home/Login",
             },
         ],
     },
     {
+        id: uuidv4(),
         category: "資料查詢",
         icon: "icon-search",
         items: [
             {
+                id: uuidv4(),
                 text: "數位資產平台",
                 link: "https://info.triwra.org.tw/Account/Login?ReturnUrl=%2F",
             },
-            { text: "購置書籍目錄", link: "data/booklist.xlsx" },
+            { id: uuidv4(), text: "購置書籍目錄", link: "data/booklist.xlsx" },
             {
+                id: uuidv4(),
                 text: "常用廠商名錄",
                 link: "https://tsr01.triwra.org.tw/km/ad_work/kmlist_vendor.asp",
             },
-            { text: "計畫投標作業", link: "https://tsr01.triwra.org.tw/km/ad_work/download/o03-04-計畫投標作業.pdf" },
+            {
+                id: uuidv4(),
+                text: "計畫投標作業",
+                link: "https://tsr01.triwra.org.tw/km/ad_work/download/o03-04-計畫投標作業.pdf",
+            },
         ],
     },
     {
+        id: uuidv4(),
         category: "職場宣導",
         icon: "icon-stethoscope",
         items: [
             {
+                id: uuidv4(),
                 text: "執行職務遭受不法侵害預防計畫",
                 link: "https://tsr01.triwra.org.tw/km/ad_work/workplaceplan.asp",
             },
-            { text: "性別平等", link: "https://tsr01.triwra.org.tw/km/ad_work/genderEquality.asp" },
-            { text: "健康檢查", list:[
-                {text: "健康檢查須知", link: "https://tsr01.triwra.org.tw/km/ad_work/download/健康檢查須知_內網公告版114.pdf" },
-                {text: "健檢支出證明單", link: "data/健康檢查支出證明單.docx" },
-                {text: "健檢資料使用同意書", link: "https://tsr01.triwra.org.tw/km/ad_work/download/06健康檢查個人資料使用同意書(空白).pdf" },
-            ] },
-            { text: "職業安全宣導", link: "https://tsr01.triwra.org.tw/km/ad_work/kmlist_training.asp" },
-            { text: "生活管理與禮儀", list:[
-                {text: "環境維護", link: "https://tsr01.triwra.org.tw/km/ad_work/download/environment0300.pdf" },
-                {text: "生活須知", link: "https://tsr01.triwra.org.tw/km/ad_work/download/environment0301.pdf" },
-                {text: "工作禮儀", link: "https://tsr01.triwra.org.tw/km/ad_work/download/environment0302.pdf" },
-            ] },
-            { text: "防疫健康聲明表", link: "data/class3_4.docx" },
-            { text: "企業CSR-淨灘與淨山", list:[
-                {text: "活動辦法", link: "https://tsr01.triwra.org.tw/km/ad_work/download/environment0500.pdf" },
-                {text: "心得報告-表格", link: "data/environment0501.docx" },
-            ] },
+            {
+                id: uuidv4(),
+                text: "性別平等",
+                link: "https://tsr01.triwra.org.tw/km/ad_work/genderEquality.asp",
+            },
+            {
+                id: uuidv4(),
+                text: "健康檢查",
+                list: [
+                    {
+                        text: "健康檢查須知",
+                        link: "https://tsr01.triwra.org.tw/km/ad_work/download/健康檢查須知_內網公告版114.pdf",
+                    },
+                    {
+                        text: "健檢支出證明單",
+                        link: "data/健康檢查支出證明單.docx",
+                    },
+                    {
+                        text: "健檢資料使用同意書",
+                        link: "https://tsr01.triwra.org.tw/km/ad_work/download/06健康檢查個人資料使用同意書(空白).pdf",
+                    },
+                ],
+            },
+            {
+                id: uuidv4(),
+                text: "職業安全宣導",
+                link: "https://tsr01.triwra.org.tw/km/ad_work/kmlist_training.asp",
+            },
+            {
+                id: uuidv4(),
+                text: "生活管理與禮儀",
+                list: [
+                    {
+                        text: "環境維護",
+                        link: "https://tsr01.triwra.org.tw/km/ad_work/download/environment0300.pdf",
+                    },
+                    {
+                        text: "生活須知",
+                        link: "https://tsr01.triwra.org.tw/km/ad_work/download/environment0301.pdf",
+                    },
+                    {
+                        text: "工作禮儀",
+                        link: "https://tsr01.triwra.org.tw/km/ad_work/download/environment0302.pdf",
+                    },
+                ],
+            },
+            {
+                id: uuidv4(),
+                text: "防疫健康聲明表",
+                link: "data/class3_4.docx",
+            },
+            {
+                id: uuidv4(),
+                text: "企業CSR-淨灘與淨山",
+                list: [
+                    {
+                        text: "活動辦法",
+                        link: "https://tsr01.triwra.org.tw/km/ad_work/download/environment0500.pdf",
+                    },
+                    {
+                        text: "心得報告-表格",
+                        link: "data/environment0501.docx",
+                    },
+                ],
+            },
         ],
     },
     {
+        id: uuidv4(),
         category: "資訊類",
         icon: "icon-plant",
         items: [
-            { text: "資訊安全管理規範", link: "https://tsr01.triwra.org.tw/km/ad_work/download/IT01.pdf" },
-            { text: "資訊服務申請單", link: "data/1.4AC.docx" },
-            { text: "圖資使用申請", list:[
-                {text: "圖資清冊表單", link: "https://docs.google.com/spreadsheets/d/1cLdbSdm1hRLSVUcbN2DZFIthtuirP1c9eq1Q0HBR-us/edit?gid=0#gid=0" },
-                {text: "圖資使用申請單", link: "data/it03_2.docx" },
-                {text: "流程及填寫說明", link: "data/it03_3.pptx" },
-            ] },
-            { text: "遠端服務使用說明", link: "https://tsr01.triwra.org.tw/km/ad_work/download/forti.pdf" },
-            { text: "電腦應用軟體", link: "https://tsr01.triwra.org.tw/km/ad_work/download/it04.pdf" },
+            {
+                id: uuidv4(),
+                text: "資訊安全管理規範",
+                link: "https://tsr01.triwra.org.tw/km/ad_work/download/IT01.pdf",
+            },
+            { id: uuidv4(), text: "資訊服務申請單", link: "data/1.4AC.docx" },
+            {
+                id: uuidv4(),
+                text: "圖資使用申請",
+                list: [
+                    {
+                        text: "圖資清冊表單",
+                        link: "https://docs.google.com/spreadsheets/d/1cLdbSdm1hRLSVUcbN2DZFIthtuirP1c9eq1Q0HBR-us/edit?gid=0#gid=0",
+                    },
+                    { text: "圖資使用申請單", link: "data/it03_2.docx" },
+                    { text: "流程及填寫說明", link: "data/it03_3.pptx" },
+                ],
+            },
+            {
+                id: uuidv4(),
+                text: "遠端服務使用說明",
+                link: "https://tsr01.triwra.org.tw/km/ad_work/download/forti.pdf",
+            },
+            {
+                id: uuidv4(),
+                text: "電腦應用軟體",
+                link: "https://tsr01.triwra.org.tw/km/ad_work/download/it04.pdf",
+            },
         ],
     },
     {
+        id: uuidv4(),
         category: "空拍類",
         icon: "icon-plant",
         items: [
-            { text: "禁飛區圖層(20210615)", link: "data/vr02.zip" },
-            { text: "單位飛行計畫規劃申請表", link: "data/vr03.docx" },
-            { text: "單位飛行計畫規劃申請表範例", link: "https://tsr01.triwra.org.tw/km/ad_work/download/vr04.pdf" },
+            {
+                id: uuidv4(),
+                text: "禁飛區圖層(20210615)",
+                link: "data/vr02.zip",
+            },
+            {
+                id: uuidv4(),
+                text: "單位飛行計畫規劃申請表",
+                link: "data/vr03.docx",
+            },
+            {
+                id: uuidv4(),
+                text: "單位飛行計畫規劃申請表範例",
+                link: "https://tsr01.triwra.org.tw/km/ad_work/download/vr04.pdf",
+            },
         ],
     },
-];
+]);
 //新增：根據搜尋字串過濾 quickLinks
 const filteredLinks = computed(() => {
-    if (!input1.value.trim()) return quickLinks;
+    if (!input1.value.trim()) return quickLinks.value;
     const keyword = input1.value.trim().toLowerCase();
     // 只顯示有符合關鍵字的分類與子連結
-    return quickLinks
+    return quickLinks.value
         .map((link) => {
             // 檢查分類名稱或子連結文字是否有符合
             const matchedItems = link.items.filter((item) =>
@@ -279,6 +550,8 @@ main {
     text-align: center;
 }
 .search-row {
+    width: 100%;
+    max-width: 1080px;
     display: flex;
     gap: 1.2rem;
     align-items: center;
@@ -370,20 +643,6 @@ main {
         no-repeat center/contain;
     display: inline-block;
 }
-.icon-pc {
-    width: 1.3rem;
-    height: 1.3rem;
-    background: url('data:image/svg+xml;utf8,<svg fill="%23678" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="5" width="18" height="12" rx="2" stroke="%23678" stroke-width="2" fill="none"/><rect x="8" y="19" width="8" height="2" rx="1" fill="%23678"/></svg>')
-        no-repeat center/contain;
-    display: inline-block;
-}
-.icon-book {
-    width: 1.3rem;
-    height: 1.3rem;
-    background: url('data:image/svg+xml;utf8,<svg fill="%23678" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 19V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14" stroke="%23678" stroke-width="2" fill="none"/><path d="M4 19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2" stroke="%23678" stroke-width="2" fill="none"/></svg>')
-        no-repeat center/contain;
-    display: inline-block;
-}
 .icon-building {
     width: 1.3rem;
     height: 1.3rem;
@@ -391,46 +650,17 @@ main {
         no-repeat center/contain;
     display: inline-block;
 }
-.icon-heart {
-    width: 1.3rem;
-    height: 1.3rem;
-    background: url('data:image/svg+xml;utf8,<svg fill="%23e11d48" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 21s-6-4.35-9-8.5C-1.5 7.5 4.5 3 12 10.5 19.5 3 25.5 7.5 21 12.5c-3 4.15-9 8.5-9 8.5z" stroke="%23e11d48" stroke-width="2" fill="none"/></svg>')
-        no-repeat center/contain;
-    display: inline-block;
+
+.kanban-board {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    overflow-x: auto;
+    padding: 1rem;
 }
-.icon-user {
-    width: 1.3rem;
-    height: 1.3rem;
-    background: url('data:image/svg+xml;utf8,<svg fill="%23678" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="8" r="4" stroke="%23678" stroke-width="2" fill="none"/><path d="M4 20v-1a8 8 0 0 1 16 0v1" stroke="%23678" stroke-width="2" fill="none"/></svg>')
-        no-repeat center/contain;
-    display: inline-block;
-}
-.icon-star {
-    width: 1.3rem;
-    height: 1.3rem;
-    background: url('data:image/svg+xml;utf8,<svg fill="%23eab308" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon points="12 2 15 8.5 22 9.3 17 14.1 18.5 21 12 17.8 5.5 21 7 14.1 2 9.3 9 8.5 12 2" stroke="%23eab308" stroke-width="2" fill="none"/></svg>')
-        no-repeat center/contain;
-    display: inline-block;
-}
-.icon-shield {
-    width: 1.3rem;
-    height: 1.3rem;
-    background: url('data:image/svg+xml;utf8,<svg fill="%23678" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 3l7 4v5c0 5.25-3.5 9.74-7 11-3.5-1.26-7-5.75-7-11V7l7-4z" stroke="%23678" stroke-width="2" fill="none"/></svg>')
-        no-repeat center/contain;
-    display: inline-block;
-}
-.icon-server {
-    width: 1.3rem;
-    height: 1.3rem;
-    background: url('data:image/svg+xml;utf8,<svg fill="%23678" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="4" width="18" height="6" rx="2" stroke="%23678" stroke-width="2" fill="none"/><rect x="3" y="14" width="18" height="6" rx="2" stroke="%23678" stroke-width="2" fill="none"/></svg>')
-        no-repeat center/contain;
-    display: inline-block;
-}
-.icon-award {
-    width: 1.3rem;
-    height: 1.3rem;
-    background: url('data:image/svg+xml;utf8,<svg fill="%23f59e42" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="8" r="6" stroke="%23f59e42" stroke-width="2" fill="none"/><path d="M8 16l-2 5 6-3 6 3-2-5" stroke="%23f59e42" stroke-width="2" fill="none"/></svg>')
-        no-repeat center/contain;
-    display: inline-block;
+.kanban-list {
+    width: 300px;
+    flex-shrink: 0;
+    height: 100%;
 }
 </style>
