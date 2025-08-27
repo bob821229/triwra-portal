@@ -59,10 +59,10 @@ let data = ref([
     idx: 4,
     name: '研究四所',
     title: '農田水利工程建設與管理研究所',
-    manager: '侯玉娟',
-    managerTitle: '所長',
+    manager: null,
+    managerTitle: null,
     core: [
-      '農業水資源工程政策研擬與效益分析',
+      '農業水資源工程政策研擬與效益研析',
       '農田水利水路系統各項工程改善調查規劃',
       '水文水理檢討與分析',
       '農業水資源工程規劃設計'
@@ -75,10 +75,10 @@ let data = ref([
     manager: '劉柏江',
     managerTitle: '所長',
     core: [
-      '農田水利暨法制作業',
-      '林業及自然保育專章法制作業',
-      '法制研討會、座談會及法制教育訓練',
-      '支援院法法律事務、各所院計畫之法律問題'
+      '農田水利署法制作業',
+      '林業及自然保育署法制作業',
+      '法律研討會、座談會及法制教育訓練',
+      '支援本院法律事務、各所處計畫之法律問題'
     ]
   },
   {
@@ -112,17 +112,17 @@ let data = ref([
     manager: '謝青宏',
     managerTitle: '副處長',
     core: [
-      '專業人力培訓',
-      '政策宣導推廣',
-      '知識傳播營銷',
+      '專業人力培訓：辦理水資源及農業各項專業教育訓練課程',
+      '政策宣導推廣：依據多元政策需求執行各項系列活動:包含政策說明會、記者會、評選表揚、典禮規劃等',
+      '知識傳播營銷：結合企劃力與科技力，應用VR（虛擬實境）技術與影像紀實，提供專業服務',
     ]
   },
   {
     idx: 9,
     name: '國際合作處',
     title: '',
-    manager: '吳宜家',
-    managerTitle: '副處長',
+    manager: null,
+    managerTitle: null,
     core: [
       '拓展與國際研究組織之合作交流管道，並建立長期夥伴關係',
       '辦理國際水資源及農業技術講習，引進國際先進技術與觀念'
@@ -145,6 +145,10 @@ let data = ref([
 ])
 const routerPush = (data) => {
   const {manager ,title}=data
+  if(!manager){
+    alert('此部門尚未指定主管資料');
+    return
+  };
     router.push({ 
       name: 'SupervisorProfile',
       params: { manager ,title}

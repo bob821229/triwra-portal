@@ -1,4 +1,8 @@
 <template>
+    {{ authStore.isAuthenticated ? '已登入' : '未登入' }}
+    <!-- v-if="authStore.isAuthenticated " -->
+    <Header  v-if="authStore.isAuthenticated " />
+     <!-- 側邊選單 -->
     <el-row class="row-bg" v-if="false">
         <el-col :span="6">
             <router-link to="/">home</router-link>
@@ -21,8 +25,10 @@ import { RouterView } from "vue-router";
 import { ref } from "vue";
 import { Search } from "@element-plus/icons-vue";
 import CategoryCard from "@/components/CategoryCard.vue";
+import Header from "@/components/backend/Header.vue";
+import { useAuthStore } from "./stores/auth"; // 引入 store
 
-const input1 = ref("");
+const authStore = useAuthStore(); // 使用 store
 </script>
 
 <style scoped>

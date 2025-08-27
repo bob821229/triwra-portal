@@ -77,14 +77,14 @@ const data = computed(() => {
   if (!managerData) return null
   return {
     ...managerData,
-    imageUrl: new URL(`../assets/images/${managerData.imageUrl}`, import.meta.url).href
+    imageUrl: `/triwra-portal/assets/images/${managerData.imageUrl}` // 修正路徑
   }
 })
 function getImageUrl(fileName) {
   console.log('getImageUrl:', fileName);
   if (!fileName) return '';
   try {
-    const url = new URL(`/images/${fileName}`, import.meta.url).href;
+    const url = new URL(`/assets/images/${fileName}`, import.meta.url).href;
     console.log('image url:', url);
     return url;
   } catch (e) {
@@ -225,7 +225,7 @@ let managerList = [
         //職務經歷
         workExperience: [
             {
-                company: "愛滴科技股份有限公司", //公司名稱
+                company: "艾滴科技股份有限公司", //公司名稱
                 position: "首席科學家", //職務名稱
                 period: [null, null], //服務起訖年月
             },
@@ -324,7 +324,7 @@ let managerList = [
         workExperience: [
             {
                 company: "台灣水資源與農業研究院", //公司名稱
-                position: "法治服務團執行祕書", //職務名稱
+                position: "法制服務團執行祕書", //職務名稱
                 period: [null, null], //服務起訖年月
             },
             {
@@ -455,8 +455,8 @@ let managerList = [
                 period: [null, null], //服務起訖年月
             },
             {
-                company: "台灣水資源與農業研究院", //公司名稱
-                position: "研究一所 研究專員", //職務名稱
+                company: "中央研究院植物暨微生物學研究所博士後", //公司名稱
+                position: "研究員", //職務名稱
                 period: [null, null], //服務起訖年月
             },
         ],
@@ -464,7 +464,7 @@ let managerList = [
     },
     {
         name: "謝青宏",
-        positionTitle: "副所長",
+        positionTitle: "副處長",
         department: "教育推廣處",
         computerExpertise: [
             "行政組織理論與管理",
@@ -509,6 +509,21 @@ let managerList = [
             {
                 company: "佛光大學公共事務學系", //公司名稱
                 position: "兼任助理教授", //職務名稱
+                period: [null, null], //服務起訖年月
+            },
+            {
+                company: "中央警察大學犯罪防治學系犯罪問題研究中心「學術專題演講」講座", //公司名稱
+                position: "", //職務名稱
+                period: [null, null], //服務起訖年月
+            },
+            {
+                company: "國立中山大學公共事務學系「公共事務管理講座」", //公司名稱
+                position: "", //職務名稱
+                period: [null, null], //服務起訖年月
+            },
+            {
+                company: "前行政院研究發展考核委員會綜合計畫處", //公司名稱
+                position: "聘用副研究員", //職務名稱
                 period: [null, null], //服務起訖年月
             },
             {

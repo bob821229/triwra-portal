@@ -2,7 +2,7 @@
     <div class="content card_wrap">
         <h2 class="txt-color">{{ data.name }}</h2>
         <h3 v-if="data.title" class="txt-color">{{ data.title }}</h3>
-        <span>主管: </span> 
+        <span v-if="data.manager">主管: </span> 
          <router-link to="/">{{data.manager}}</router-link>
         {{ data.managerTitle }}
         <br>
